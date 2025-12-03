@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mahmoud-Elhadry Chat</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050505;
+      --panel: #111111;
+      --sidebar: #0b0b0b;
+      --accent: #ff1744;
+      --accent-light: rgba(255, 23, 68, 0.2);
+      --text: #f5f5f5;
+      --muted: #9e9e9e;
+      --success: #00c853;
+      --error: #ff5252;
+      font-family: "Cairo", "Tajawal", "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at top, rgba(255, 23, 68, 0.12), transparent 55%), var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h1, h2, h3 {
+      font-weight: 600;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .app {
+      width: min(1200px, 95vw);
+    }
+
+    .auth-wrapper {
+      display: grid;
+      gap: 2.5rem;
+      background: rgba(10, 10, 10, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 3rem;
+      border-radius: 24px;
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+    }
+
+    .app-logo h1 {
+      font-size: clamp(2.5rem, 4vw, 3.4rem);
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    .app-logo p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 480px;
+    }
+
+    .auth-card {
+      background: var(--panel);
+      border-radius: 20px;
+      padding: 2.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: inset 0 0 0 1px rgba(255, 23, 68, 0.08);
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 14px;
+      padding: 0.35rem;
+      margin-bottom: 2rem;
+    }
+
+    .auth-tab {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.25s ease;
+    }
+
+    .auth-tab.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(255, 23, 68, 0.35);
+    }
+
+    .auth-form {
+      display: none;
+      gap: 1.25rem;
+    }
+
+    .auth-form.active {
+      display: grid;
+    }
+
+    .form-group {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    input {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 1rem;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: rgba(255, 23, 68, 0.8);
+      box-shadow: 0 0 0 2px rgba(255, 23, 68, 0.18);
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, rgba(255, 23, 68, 0.95), rgba(255, 71, 97, 0.95));
+      border: none;
+      color: #fff;
+      padding: 0.9rem 1.2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 15px 35px rgba(255, 23, 68, 0.35);
+    }
+
+    .ghost-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      border-radius: 12px;
+      padding: 0.9rem 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: border 0.2s ease, color 0.2s ease;
+    }
+
+    .ghost-btn:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+
+    .divider {
+      position: relative;
+      text-align: center;
+      margin: 1.75rem 0;
+      color: var(--muted);
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 38%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .divider::before {
+      right: 0;
+    }
+
+    .divider::after {
+      left: 0;
+    }
+
+    .chat-container {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 1.5rem;
+      width: min(1200px, 98vw);
+      height: min(90vh, 760px);
+    }
+
+    .sidebar {
+      background: rgba(10, 10, 10, 0.9);
+      border-radius: 24px;
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.2rem;
+    }
+
+    .user-count {
+      background: rgba(255, 23, 68, 0.18);
+      color: var(--accent);
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+    }
+
+    .user-list {
+      list-style: none;
+      overflow-y: auto;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .user-list::-webkit-scrollbar,
+    .messages::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .user-list::-webkit-scrollbar-thumb,
+    .messages::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+    }
+
+    .user-item {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid transparent;
+      transition: border 0.3s ease, background 0.3s ease;
+    }
+
+    .user-item.active {
+      border-color: rgba(255, 23, 68, 0.65);
+      background: rgba(255, 23, 68, 0.12);
+    }
+
+    .user-meta {
+      display: grid;
+      gap: 0.15rem;
+    }
+
+    .user-meta strong {
+      font-size: 0.95rem;
+    }
+
+    .status-dot {
+      display: inline-flex;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-left: 0.35rem;
+      background: var(--muted);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    }
+
+    .status-online {
+      background: var(--success);
+      box-shadow: 0 0 10px rgba(0, 200, 83, 0.6);
+    }
+
+    .status-offline {
+      background: var(--muted);
+    }
+
+    .user-status {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .chat-panel {
+      background: rgba(10, 10, 10, 0.8);
+      border-radius: 24px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+      box-shadow: inset 0 0 0 1px rgba(255, 23, 68, 0.06);
+    }
+
+    .chat-header {
+      padding: 1.6rem 1.8rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-header h1 {
+      font-size: 1.4rem;
+      margin-bottom: 0.3rem;
+      color: #fff;
+    }
+
+    .chat-header p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .header-actions span {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .signout-btn {
+      background: rgba(255, 23, 68, 0.18);
+      color: var(--accent);
+      border: 1px solid rgba(255, 23, 68, 0.45);
+      border-radius: 12px;
+      padding: 0.55rem 0.95rem;
+      font-weight: 600;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .signout-btn:hover {
+      background: rgba(255, 23, 68, 0.28);
+      transform: translateY(-1px);
+    }
+
+    .info-banner {
+      margin: 0 1.8rem;
+      margin-top: 1.2rem;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 0.75rem 1.1rem;
+      font-size: 0.9rem;
+      border: 1px solid transparent;
+    }
+
+    .info-banner.info {
+      border-color: rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+    }
+
+    .info-banner.error {
+      border-color: rgba(255, 82, 82, 0.6);
+      color: #ff8a80;
+      background: rgba(255, 82, 82, 0.12);
+    }
+
+    .info-banner.success {
+      border-color: rgba(0, 200, 83, 0.6);
+      color: #69f0ae;
+      background: rgba(0, 200, 83, 0.12);
+    }
+
+    .messages {
+      padding: 1.8rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message {
+      max-width: 70%;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.9rem 1rem;
+      border-radius: 18px;
+      display: grid;
+      gap: 0.55rem;
+      border: 1px solid transparent;
+      position: relative;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .message.sent {
+      margin-left: auto;
+      background: rgba(255, 23, 68, 0.22);
+      border-color: rgba(255, 23, 68, 0.4);
+    }
+
+    .message.received {
+      margin-right: auto;
+    }
+
+    .message .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .message .text {
+      word-wrap: break-word;
+      font-size: 0.98rem;
+      line-height: 1.6;
+    }
+
+    .message .name {
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    @keyframes fadeIn {
+      from {
+        transform: translateY(4px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .message-form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      padding: 1.5rem 1.8rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(11, 11, 11, 0.92);
+    }
+
+    .message-input {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 0.95rem 1.2rem;
+      color: var(--text);
+      font-size: 1rem;
+      transition: border 0.2s ease;
+    }
+
+    .message-input:focus {
+      border-color: rgba(255, 23, 68, 0.45);
+      outline: none;
+    }
+
+    .send-btn {
+      border: none;
+      background: linear-gradient(135deg, rgba(255, 23, 68, 1), rgba(255, 82, 82, 0.9));
+      border-radius: 14px;
+      padding: 0.9rem 1.6rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.03em;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(255, 23, 68, 0.4);
+    }
+
+    .helper-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .highlight-link {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    @media (max-width: 1024px) {
+      body {
+        padding: 1rem 0.5rem;
+      }
+
+      .chat-container {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .sidebar {
+        display: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .auth-wrapper {
+        padding: 2rem;
+      }
+
+      .auth-card {
+        padding: 1.8rem;
+      }
+
+      .chat-panel {
+        border-radius: 18px;
+      }
+
+      .message {
+        max-width: 84%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section id="auth-screen" class="auth-wrapper">
+      <div class="app-logo">
+        <h1>Mahmoud-Elhadry Chat</h1>
+        <p>منصة دردشة محترفة بتصميم داكن ولمسات حمراء نابضة بالحياة.</p>
+      </div>
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-mode="login">تسجيل الدخول</button>
+          <button class="auth-tab" data-mode="signup">إنشاء حساب</button>
+        </div>
+        <form id="login-form" class="auth-form active">
+          <div class="form-group">
+            <label for="login-email">البريد الإلكتروني</label>
+            <input id="login-email" type="email" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="login-password">كلمة المرور</label>
+            <input id="login-password" type="password" placeholder="••••••••" minlength="6" required>
+          </div>
+          <button class="primary-btn" type="submit">تسجيل الدخول</button>
+        </form>
+        <form id="signup-form" class="auth-form">
+          <div class="form-group">
+            <label for="signup-name">الاسم الكامل</label>
+            <input id="signup-name" type="text" placeholder="Mahmoud Elhadry" required>
+          </div>
+          <div class="form-group">
+            <label for="signup-email">البريد الإلكتروني</label>
+            <input id="signup-email" type="email" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="signup-password">كلمة المرور</label>
+            <input id="signup-password" type="password" placeholder="••••••••" minlength="6" required>
+          </div>
+          <p class="helper-text">بإنشائك حسابًا، سيتم إرسال رسالة تحقق إلى بريدك الإلكتروني.</p>
+          <button class="primary-btn" type="submit">إنشاء حساب جديد</button>
+        </form>
+        <div class="divider">أو</div>
+        <button id="google-login" class="ghost-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.58 30.47 0 24 0 14.62 0 6.51 5.27 2.56 12.94l7.98 6.2C12.45 13.01 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.5 24.55c0-1.58-.13-3.09-.38-4.55H24v9.04h12.7c-.55 2.9-2.23 5.36-4.73 7.02l7.27 5.65C43.93 38.45 46.5 31.9 46.5 24.55z"/>
+            <path fill="#FBBC05" d="M10.54 28.86c-.48-1.45-.76-3-.76-4.86s.28-3.41.76-4.86l-7.98-6.2C.92 16.15 0 19.95 0 24s.92 7.85 2.56 10.86l7.98-6.2z"/>
+            <path fill="#34A853" d="M24 47.5c6.48 0 11.94-2.13 15.92-5.86l-7.27-5.65C30.48 38.64 27.47 39.5 24 39.5c-6.26 0-11.55-3.51-14.46-8.64l-7.98 6.2C6.51 42.73 14.62 47.5 24 47.5z"/>
+            <path fill="none" d="M0 0h48v48H0z"/>
+          </svg>
+          <span>تسجيل الدخول عبر Google</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="chat-screen" class="hidden">
+      <div class="chat-container">
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <h2>جهات الاتصال</h2>
+            <span id="online-count" class="user-count">0 متصل</span>
+          </div>
+          <ul id="user-list" class="user-list"></ul>
+        </aside>
+        <main class="chat-panel">
+          <header class="chat-header">
+            <div>
+              <h1>Mahmoud-Elhadry Chat</h1>
+              <p id="user-status-info">جارٍ التحميل...</p>
+            </div>
+            <div class="header-actions">
+              <span id="current-user-name">...</span>
+              <button id="signout-btn" class="signout-btn" type="button">تسجيل الخروج</button>
+            </div>
+          </header>
+          <div id="info-banner" class="info-banner hidden"></div>
+          <section id="messages" class="messages"></section>
+          <form id="message-form" class="message-form">
+            <input id="message-input" class="message-input" type="text" placeholder="اكتب رسالة..." autocomplete="off">
+            <button class="send-btn" type="submit">إرسال</button>
+          </form>
+        </main>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      GoogleAuthProvider,
+      signInWithPopup,
+      sendEmailVerification,
+      updateProfile,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import {
+      getDatabase,
+      ref,
+      set,
+      update,
+      onValue,
+      onChildAdded,
+      query,
+      orderByChild,
+      limitToLast,
+      push,
+      onDisconnect
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      databaseURL: "YOUR_DATABASE_URL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const googleProvider = new GoogleAuthProvider();
+    googleProvider.setCustomParameters({ prompt: "select_account" });
+
+    const authScreen = document.getElementById("auth-screen");
+    const chatScreen = document.getElementById("chat-screen");
+    const authTabs = document.querySelectorAll(".auth-tab");
+    const authForms = document.querySelectorAll(".auth-form");
+    const loginForm = document.getElementById("login-form");
+    const signupForm = document.getElementById("signup-form");
+    const googleLoginBtn = document.getElementById("google-login");
+    const signoutBtn = document.getElementById("signout-btn");
+    const onlineCount = document.getElementById("online-count");
+    const userListEl = document.getElementById("user-list");
+    const messagesEl = document.getElementById("messages");
+    const messageForm = document.getElementById("message-form");
+    const messageInput = document.getElementById("message-input");
+    const infoBanner = document.getElementById("info-banner");
+    const currentUserNameEl = document.getElementById("current-user-name");
+    const userStatusInfoEl = document.getElementById("user-status-info");
+
+    let currentUser = null;
+    let usersData = {};
+    let statusData = {};
+    let messagesUnsubscribe = null;
+    let connectionListener = null;
+    let statusRef = null;
+    let userPresenceRef = null;
+
+    const escapeHTML = (unsafe = "") => unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+    const formatTime = (timestamp) => {
+      if (!timestamp) return "غير متوفر";
+      const date = new Date(timestamp);
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+      const day = date.toLocaleDateString("ar-EG", { weekday: "short" });
+      return `${day} ${hours}:${minutes}`;
+    };
+
+    const showInfo = (message, type = "info") => {
+      infoBanner.textContent = message;
+      infoBanner.className = `info-banner ${type}`;
+      infoBanner.classList.remove("hidden");
+      clearTimeout(showInfo.timer);
+      showInfo.timer = setTimeout(() => {
+        infoBanner.classList.add("hidden");
+      }, 6000);
+    };
+
+    const clearInfo = () => {
+      infoBanner.classList.add("hidden");
+      infoBanner.textContent = "";
+    };
+
+    const switchAuthMode = (mode) => {
+      authTabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.mode === mode));
+      authForms.forEach((form) => form.classList.toggle("active", form.id.startsWith(mode)));
+    };
+
+    authTabs.forEach((tab) => {
+      tab.addEventListener("click", () => switchAuthMode(tab.dataset.mode));
+    });
+
+    const sanitizeEmail = (email = "") => email.trim().toLowerCase();
+    const sanitizeName = (name = "") => name.trim().replace(/\s{2,}/g, " ");
+
+    const parseFirebaseError = (error) => {
+      const code = error?.code ?? "auth/unknown";
+      const map = {
+        "auth/email-already-in-use": "هذا البريد مسجّل بالفعل. جرّب تسجيل الدخول.",
+        "auth/invalid-email": "البريد الإلكتروني غير صالح.",
+        "auth/user-disabled": "تم تعطيل هذا المستخدم.",
+        "auth/user-not-found": "لا يوجد حساب مرتبط بهذا البريد.",
+        "auth/wrong-password": "كلمة المرور غير صحيحة.",
+        "auth/weak-password": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.",
+        "auth/popup-closed-by-user": "تم إغلاق النافذة المنبثقة قبل إتمام العملية.",
+        "auth/credential-already-in-use": "حساب Google مرتبط بالفعل بحساب آخر."
+      };
+      return map[code] || "حدث خطأ غير متوقع. حاول مرة أخرى.";
+    };
+
+    const renderUserList = () => {
+      userListEl.innerHTML = "";
+      const entries = Object.entries(usersData);
+      if (!entries.length) {
+        userListEl.innerHTML = `<li class="user-item"><span>لا يوجد مستخدمون بعد.</span></li>`;
+        return;
+      }
+
+      let onlineUsers = 0;
+      entries.forEach(([uid, user]) => {
+        const statusEntry = statusData[uid];
+        const isOnline = statusEntry?.state === "online";
+        if (isOnline) onlineUsers += 1;
+        const lastSeen = statusEntry?.lastChanged || user?.lastSeen;
+        const statusText = isOnline ? "متصل الآن" : lastSeen ? `غير متصل • آخر ظهور ${formatTime(lastSeen)}` : "غير متصل";
+
+        const item = document.createElement("li");
+        item.className = "user-item" + (currentUser?.uid === uid ? " active" : "");
+        item.innerHTML = `
+          <div class="user-meta">
+            <strong>${escapeHTML(user?.displayName || "مستخدم")}</strong>
+            <span class="user-status">
+              <span class="status-dot ${isOnline ? "status-online" : "status-offline"}"></span>
+              ${statusText}
+            </span>
+          </div>
+        `;
+        userListEl.appendChild(item);
+      });
+
+      onlineCount.textContent = `${onlineUsers} متصل`;
+    };
+
+    const renderMessage = (data) => {
+      const { uid, text, timestamp, displayName } = data;
+      const isOwn = currentUser && uid === currentUser.uid;
+      const bubble = document.createElement("div");
+      bubble.className = `message ${isOwn ? "sent" : "received"}`;
+      bubble.innerHTML = `
+        <div class="meta">
+          <span class="name">${escapeHTML(displayName || "مستخدم")}</span>
+          <span class="time">${formatTime(timestamp)}</span>
+        </div>
+        <div class="text">${escapeHTML(text || "")}</div>
+      `;
+      messagesEl.appendChild(bubble);
+      messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: "smooth" });
+    };
+
+    const resetChatUI = () => {
+      messagesEl.innerHTML = "";
+      currentUserNameEl.textContent = "...";
+      userStatusInfoEl.textContent = "غير متصل";
+      clearInfo();
+    };
+
+    const subscribeUsers = () => {
+      const usersRef = ref(db, "users");
+      const statusRefLive = ref(db, "status");
+
+      onValue(usersRef, (snapshot) => {
+        usersData = snapshot.val() || {};
+        renderUserList();
+      });
+
+      onValue(statusRefLive, (snapshot) => {
+        statusData = snapshot.val() || {};
+        renderUserList();
+      });
+    };
+
+    const subscribeMessages = () => {
+      if (typeof messagesUnsubscribe === "function") {
+        messagesUnsubscribe();
+      }
+      messagesEl.innerHTML = "";
+
+      const messagesRef = query(ref(db, "messages"), orderByChild("timestamp"), limitToLast(200));
+      messagesUnsubscribe = onChildAdded(messagesRef, (snapshot) => {
+        const message = snapshot.val();
+        if (!message) return;
+        renderMessage(message);
+      });
+    };
+
+    const updateUserProfileRecord = async (user) => {
+      if (!user) return;
+      const userRef = ref(db, `users/${user.uid}`);
+      const payload = {
+        displayName: user.displayName || user.email?.split("@")[0] || "مستخدم",
+        email: user.email || "",
+        photoURL: user.photoURL || "",
+        lastSeen: Date.now()
+      };
+      await update(userRef, payload);
+    };
+
+    const startPresenceTracking = (user) => {
+      if (!user) return;
+
+      const connectedRef = ref(db, ".info/connected");
+      statusRef = ref(db, `status/${user.uid}`);
+      userPresenceRef = ref(db, `users/${user.uid}`);
+
+      if (connectionListener) {
+        connectionListener();
+      }
+
+      connectionListener = onValue(connectedRef, (snapshot) => {
+        if (snapshot.val() === false) {
+          return;
+        }
+
+        onDisconnect(statusRef).set({
+          state: "offline",
+          lastChanged: Date.now()
+        });
+
+        onDisconnect(userPresenceRef).update({
+          lastSeen: Date.now()
+        });
+
+        set(statusRef, {
+          state: "online",
+          lastChanged: Date.now()
+        });
+
+        update(userPresenceRef, {
+          status: "online",
+          lastSeen: Date.now()
+        });
+      });
+    };
+
+    const stopPresenceTracking = async () => {
+      if (connectionListener) {
+        connectionListener();
+        connectionListener = null;
+      }
+      if (statusRef) {
+        await set(statusRef, {
+          state: "offline",
+          lastChanged: Date.now()
+        });
+      }
+      if (userPresenceRef) {
+        await update(userPresenceRef, {
+          status: "offline",
+          lastSeen: Date.now()
+        });
+      }
+      statusRef = null;
+      userPresenceRef = null;
+    };
+
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const email = sanitizeEmail(document.getElementById("login-email").value);
+      const password = document.getElementById("login-password").value;
+      if (!email || !password) {
+        showInfo("يرجى إدخال البريد الإلكتروني وكلمة المرور.", "error");
+        return;
+      }
+      try {
+        clearInfo();
+        await signInWithEmailAndPassword(auth, email, password);
+        showInfo("تم تسجيل الدخول بنجاح.", "success");
+      } catch (error) {
+        showInfo(parseFirebaseError(error), "error");
+      }
+    });
+
+    signupForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const name = sanitizeName(document.getElementById("signup-name").value);
+      const email = sanitizeEmail(document.getElementById("signup-email").value);
+      const password = document.getElementById("signup-password").value;
+
+      if (!name || !email || !password) {
+        showInfo("يرجى تعبئة جميع الحقول.", "error");
+        return;
+      }
+
+      try {
+        clearInfo();
+        const credential = await createUserWithEmailAndPassword(auth, email, password);
+        if (name) {
+          await updateProfile(credential.user, { displayName: name });
+        }
+        await updateUserProfileRecord(credential.user);
+        await sendEmailVerification(credential.user);
+        showInfo("تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتفعيل الحساب.", "success");
+        await signOut(auth);
+        switchAuthMode("login");
+      } catch (error) {
+        showInfo(parseFirebaseError(error), "error");
+      }
+    });
+
+    googleLoginBtn.addEventListener("click", async () => {
+      try {
+        clearInfo();
+        const credential = await signInWithPopup(auth, googleProvider);
+        await updateUserProfileRecord(credential.user);
+        showInfo("تم تسجيل الدخول باستخدام Google.", "success");
+      } catch (error) {
+        showInfo(parseFirebaseError(error), "error");
+      }
+    });
+
+    signoutBtn.addEventListener("click", async () => {
+      try {
+        await stopPresenceTracking();
+        await signOut(auth);
+        showInfo("تم تسجيل الخروج بنجاح.", "info");
+      } catch (error) {
+        showInfo("تعذر تسجيل الخروج. حاول مرة أخرى.", "error");
+      }
+    });
+
+    messageForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!currentUser) {
+        showInfo("يجب تسجيل الدخول لإرسال الرسائل.", "error");
+        return;
+      }
+      const text = messageInput.value.trim();
+      if (!text) {
+        return;
+      }
+      const newMessageRef = push(ref(db, "messages"));
+      messageForm.querySelector("button").disabled = true;
+      try {
+        await set(newMessageRef, {
+          uid: currentUser.uid,
+          displayName: currentUser.displayName || currentUser.email || "مستخدم",
+          text,
+          timestamp: Date.now()
+        });
+        messageInput.value = "";
+        messageInput.focus();
+      } catch (error) {
+        showInfo("تعذر إرسال الرسالة. حاول مرة أخرى.", "error");
+      } finally {
+        messageForm.querySelector("button").disabled = false;
+      }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      if (user) {
+        authScreen.classList.add("hidden");
+        chatScreen.classList.remove("hidden");
+        currentUserNameEl.textContent = user.displayName || user.email || "مستخدم";
+        userStatusInfoEl.textContent = user.emailVerified ? "بريدك الإلكتروني مُفعّل. استمتع بالمحادثة!" : "حسابك غير متحقق. يرجى فحص البريد للتفعيل.";
+        if (!user.emailVerified) {
+          showInfo("يرجى التحقق من بريدك الإلكتروني لإلغاء القيود.", "info");
+        } else {
+          clearInfo();
+        }
+        await updateUserProfileRecord(user);
+        subscribeUsers();
+        subscribeMessages();
+        startPresenceTracking(user);
+      } else {
+        resetChatUI();
+        authScreen.classList.remove("hidden");
+        chatScreen.classList.add("hidden");
+        currentUser = null;
+        usersData = {};
+        statusData = {};
+        if (typeof messagesUnsubscribe === "function") {
+          messagesUnsubscribe();
+          messagesUnsubscribe = null;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
